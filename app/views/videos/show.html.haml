@@ -1,0 +1,30 @@
+%p#notice= notice
+
+- if @video.processed
+  %video{controls: true}
+    %source{src: @video.content_url}
+- else
+  %p#notice
+    The video is currently being processed...
+
+%ul
+  - @video.comments.each do |comment|
+    %li
+      %b
+        =comment.user.email
+      %br
+      = comment.body
+
+- unless current_user
+  %div
+    = link_to "Login", new_user_session_path
+    or
+    = link_to "Register", new_user_registration_path
+    to leave a comment
+- else
+  = simple_form_for [@video, @comment] do |f|
+    = f.input :body, as: :text, label: false, input_html: { rows: 3 }
+    = f.hidden_field :user_id, value: current_user.id
+    = f.submit 'Add comment'
+
+= link_to 'Back', videos_path
